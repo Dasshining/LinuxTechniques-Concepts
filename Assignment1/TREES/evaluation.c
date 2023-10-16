@@ -20,11 +20,35 @@ typedef struct student_{
     unsigned int total_marks;
 } student_t;
 
+tree_node_t *getLeftMost(tree_node_t *current){
+    tree_node_t *node = current;
+    while(node->left != NULL){
+        node = node->left;
+    }
+    return node;
+}
+
+tree_node_t *getNext(tree_node_t *current){
+    tree_node_t *node = current;
+    if(node->right){
+    	node = node->right;
+    	node = getLeftMost(node);
+        return node;
+    }
+    
+    tree_node_t *parent = node->parent;
+    while(parent && parent->right == node){
+    	node = parent;
+    }
+    return node->parent;
+}
+
 
 /*Step 2 : Implement list iterator function here*/
 void* tree_iterator (void *tree_node){
     /*write your code here*/
-    return((tree_node_t *)tree_node)->right;
+    tree_node_t *current = tree_node;
+    return getNext(current);
 }
 
 /*Step 3 : implement student comparator function here*/
@@ -94,6 +118,7 @@ main(int argc, char **argv){
     student_node_1->right = student_node_2;
     student_node_1->left  = student_node_3;
     student_node_2->right = student_node_4;
+    student_node_1->parent = NULL;
     student_node_2->parent = student_node_1;
     student_node_3->parent = student_node_1;
     student_node_4->parent = student_node_4;
@@ -137,13 +162,14 @@ main(int argc, char **argv){
     student_node_5->right = student_node_6;
     student_node_5->left  = student_node_7;
     student_node_6->right = student_node_8;
+    student_node_5->parent = NULL;
     student_node_6->parent = student_node_5;
     student_node_7->parent = student_node_5;
     student_node_6->parent = student_node_8;
 
     /*Step 6*/
 
-    if(diff((void *)student_tree1->root, (void *)student_tree2->root, tree_iterator, student_comparator, get_app_data_from_tree_node) == 0)
+    if(diff((void *)getLeftMost(student_tree1->root), (void *)getLeftMost(student_tree2->root), tree_iterator, student_comparator, get_app_data_from_tree_node) == 0)
         printf("Data sructures are equal\n");
     else
         printf("Data sructures are not equal\n");
